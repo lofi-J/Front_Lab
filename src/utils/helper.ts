@@ -27,3 +27,21 @@ export const FILE_TITLE = {
   'css': 'style.css',
   'js': 'app.js'
 }
+
+export const setLocalStorage = <T>(key: string, value: T) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value))
+  } catch(err) {
+    alert('저장 중 에러 발생 Log 확인')
+    console.error(err)
+  }
+}
+
+export const getLocalStorage = (key: string) => {
+  const result = localStorage.getItem(key)
+  if (result !== null) {
+    return JSON.parse(result)
+  } else {
+    return undefined
+  }
+}

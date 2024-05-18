@@ -34,3 +34,9 @@ const mainCss = css`
 `
 
 export default App
+
+/*
+* TODO LIST
+* code 자동 완성 기능 안내 or 설정 파일 구성
+* 코드 에디터 가독성 및 편의성 개선
+* */

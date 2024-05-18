@@ -1,18 +1,17 @@
 import {useEffect, useState} from "react"
-import {TLanguage} from "../utils/helper.ts";
+import {TLanguage} from "../utils/helper.ts"
 
 const PREFIX = 'front-lab-'
 
-// TODO local storage not working (Error)
-const useLocalStorage = (key: TLanguage, value: string) => {
+const useLocalStorage = (key: TLanguage) => {
   const localStorageKey = PREFIX + key
   
   const [code, setCode] = useState<string>(() => {
-    const jsonCode = localStorage.getItem(localStorageKey)
+    const currentCode = localStorage.getItem(localStorageKey)
     
-    if (jsonCode !== null) return JSON.parse(jsonCode)
+    if (currentCode !== null) return JSON.parse(currentCode)
     
-    return value
+    return ''
   })
   
   useEffect(() => {

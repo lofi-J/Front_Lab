@@ -2,22 +2,22 @@ import {css} from "@emotion/react"
 import { BsFiletypeHtml, BsFiletypeJs } from "react-icons/bs"
 import { BsFiletypeCss } from "react-icons/bs"
 import {useEffect, useState} from "react"
-import Ground from "../components/playground/Ground.tsx"
-import {FILE_TITLE, TLanguage} from "../utils/helper.ts"
+import {FILE_TITLE, getLocalStorage, setLocalStorage, TLanguage} from "../utils/helper.ts"
 import useLocalStorage from "../hooks/useLocalStorage.ts"
+import Ground from "../components/playground/Ground.tsx"
 
 
 const Playground = () => {
-  const [selectedLang, setSelectedLang] = useState<TLanguage[]>(['html'])
-  const {code: html, setCode: setHtml} = useLocalStorage('html', '');
-  const {code: css, setCode: setCss} = useLocalStorage('css', '');
-  const {code: js, setCode: setJs} = useLocalStorage('js', '');
+  const [selectedLang, setSelectedLang] = useState<TLanguage[]>(getLocalStorage('selected-file') || ['js'])
+  const {code: html, setCode: setHtml} = useLocalStorage('html')
+  const {code: css, setCode: setCss} = useLocalStorage('css')
+  const {code: js, setCode: setJs} = useLocalStorage('js')
   const [srcDoc, setSrcDoc] = useState('')
   
   useEffect(() => {
     const timeout = setTimeout(() => {
       setSrcDoc(`
-        <html>
+        <html lang="en">
           <body>${html}</body>
           <style>${css}</style>
           <script>${js}</script>
@@ -26,7 +26,6 @@ const Playground = () => {
     }, 250)
     return () => clearTimeout(timeout)
   }, [html, css, js])
-  
   
   const checkSelectedLang = (lang: TLanguage) => {
     let result = false
@@ -39,23 +38,27 @@ const Playground = () => {
   }
   
   const handleSelectedLanguage = (lang: TLanguage) => {
-    setSelectedLang(prev => {
-      if (prev.includes(lang)) return prev.filter(i => i !== lang)
-      else return [...prev, lang]
-    })
+    let result
+    if (selectedLang.includes(lang)) {
+      result = selectedLang.filter(i => i !== lang)
+    } else {
+      result = [...selectedLang, lang]
+    }
+
+    setLocalStorage('selected-file', result)
+    setSelectedLang(result)
   }
   
-  const getStateByLnag = (lang: TLanguage) => {
+  const getStateByLang = (lang: TLanguage) => {
     switch (lang) {
       case "html":
-        return [html, setHtml]
+        return { code: html, setter: setHtml }
       case "css":
-        return [css, setCss]
+        return { code: css, setter: setCss }
       case "js":
-        return [js, setJs]
+        return { code: js, setter: setJs }
     }
   }
-  console.log(getStateByLnag('html')[0])
   
   return (
     <main css={mainCss}>
@@ -73,24 +76,28 @@ const Playground = () => {
           <b>app.js</b>
         </span>
       </div>
-      
-      {/*<div className={'code-view'}>*/}
-      {/*  {selectedLang.map(lang => (*/}
-      {/*    <Ground*/}
-      {/*      key={`code_${lang}`}*/}
-      {/*      lang={lang}*/}
-      {/*      title={FILE_TITLE[lang]}*/}
-      {/*      code={getStateByLnag(lang)[0]}*/}
-      {/*      setCode={getStateByLnag(lang)[1]}*/}
-      {/*    />))*/}
-      {/*  }*/}
-      {/*</div>*/}
-      
-      <div className={'result-view'}>
-        <iframe
-          srcDoc={srcDoc}
-        />
-      </div>
+
+      {!!selectedLang.length && (
+        <div className={'code-wrap'}>
+          <div className={'code-view'}>
+            {selectedLang.map(lang => (
+              <Ground
+                key={`code_${lang}`}
+                lang={lang}
+                title={FILE_TITLE[lang]}
+                code={getStateByLang(lang).code}
+                setCode={getStateByLang(lang).setter}
+              />))
+            }
+          </div>
+
+          <div className={'result-view'}>
+            <iframe
+              srcDoc={srcDoc}
+            />
+          </div>
+        </div>
+      )}
     </main>
   )
 }
@@ -105,7 +112,7 @@ const mainCss = css`
       align-items: center;
       gap: 0.2rem;
       cursor: pointer;
-      svg {
+        svg {
         width: 1.5rem;
         height: 1.5rem;
       }
@@ -122,9 +129,23 @@ const mainCss = css`
       }
     }
   }
-  .code-view {
+  .code-wrap {
     display: flex;
+    flex-direction: column;
     gap: 1rem;
+    .code-view {
+      display: flex;
+      gap: 1rem;
+    }
+    .result-view {
+      border: 1px solid darkblue;
+      border-radius: 8px;
+      padding: 3px;
+      iframe {
+        width: 100%;
+        border: unset;
+      }
+    }
   }
 `;
 
