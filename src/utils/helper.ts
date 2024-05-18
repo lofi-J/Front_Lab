@@ -10,3 +10,20 @@ export const getLangColor = (lang: TLanguage) => {
       return '#F7DF1E'
   }
 }
+
+export const getMirrorModeByLang = (lang: TLanguage) => {
+  switch (lang) {
+    case "html":
+      return 'xml'
+    case "css":
+      return 'css'
+    case "js":
+      return 'javascript'
+  }
+}
+
+export const FILE_TITLE = {
+  'html': 'index.html',
+  'css': 'style.css',
+  'js': 'app.js'
+}

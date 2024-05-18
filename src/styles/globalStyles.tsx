@@ -52,7 +52,7 @@ export const globalStyles = css`
 		-webkit-user-select: none;
 		-moz-user-select: none;
 		-ms-user-select: none;
-		user-select: none
+		user-select: none;
 	}
 	
 	body {
