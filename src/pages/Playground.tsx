@@ -5,7 +5,10 @@ import {useEffect, useState} from "react"
 import {FILE_TITLE, getLocalStorage, setLocalStorage, TLanguage} from "../utils/helper.ts"
 import useLocalStorage from "../hooks/useLocalStorage.ts"
 import Ground from "../components/playground/Ground.tsx"
+import { GoBrowser } from "react-icons/go"
+import { VscDebugConsole } from "react-icons/vsc"
 
+type TResultMode = 'browser' | 'console'
 
 const Playground = () => {
   const [selectedLang, setSelectedLang] = useState<TLanguage[]>(getLocalStorage('selected-file') || ['js'])
@@ -13,6 +16,7 @@ const Playground = () => {
   const {code: css, setCode: setCss} = useLocalStorage('css')
   const {code: js, setCode: setJs} = useLocalStorage('js')
   const [srcDoc, setSrcDoc] = useState('')
+  const [resultMode, setResultMode] = useState<TResultMode[]>(['browser'])
   
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -60,6 +64,14 @@ const Playground = () => {
     }
   }
   
+  const onClickResultIcon = (mode: TResultMode) => {
+    if (resultMode.includes(mode)) {
+      setResultMode(resultMode.filter(i => i !== mode))
+    } else {
+      setResultMode([...resultMode, mode])
+    }
+  }
+  
   return (
     <main css={mainCss}>
       <div className={'switch-view'}>
@@ -90,11 +102,30 @@ const Playground = () => {
               />))
             }
           </div>
-
+          
           <div className={'result-view'}>
-            <iframe
-              srcDoc={srcDoc}
-            />
+            <div className={'icons-wrap'}>
+              <GoBrowser
+                className={`${resultMode.includes('browser') ? 'active' : ''}`}
+                onClick={() => onClickResultIcon('browser')}
+              />
+              <VscDebugConsole
+                className={`${resultMode.includes('console') ? 'active' : ''}`}
+                onClick={() => onClickResultIcon('console')}
+              />
+            </div>
+            {resultMode.includes('browser') && (
+              <div className={"browser"}>
+                <div className="iframe-wrap">
+                  <iframe srcDoc={srcDoc} />
+                </div>
+              </div>
+            )}
+            {resultMode.includes('console') && (
+              <div className={"console"}>
+                <div></div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -103,50 +134,93 @@ const Playground = () => {
 }
 
 const mainCss = css`
-  .switch-view {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    .language {
-      display: flex;
-      align-items: center;
-      gap: 0.2rem;
-      cursor: pointer;
-        svg {
-        width: 1.5rem;
-        height: 1.5rem;
-      }
-      b {
-        font-size: 1.3rem;
-      }
-    }
-    .active {
-      svg {
-        fill: var(--primary-color);
-      }
-      b {
-        color: var(--primary-color);
-      }
-    }
-  }
-  .code-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    .code-view {
-      display: flex;
-      gap: 1rem;
-    }
-    .result-view {
-      border: 1px solid darkblue;
-      border-radius: 8px;
-      padding: 3px;
-      iframe {
-        width: 100%;
-        border: unset;
-      }
-    }
-  }
+	.switch-view {
+		display: flex;
+		gap: 1rem;
+		margin-bottom: 2rem;
+		
+		.language {
+			display: flex;
+			align-items: center;
+			gap: 0.2rem;
+			cursor: pointer;
+			
+			svg {
+				width: 1.5rem;
+				height: 1.5rem;
+			}
+			
+			b {
+				font-size: 1.3rem;
+			}
+		}
+		
+		.active {
+			svg {
+				fill: var(--primary-color);
+			}
+			
+			b {
+				color: var(--primary-color);
+			}
+		}
+	}
+	
+	.code-wrap {
+		display: flex;
+		flex-direction: column;
+		gap: 2.4rem;
+		
+		.code-view {
+			display: flex;
+			gap: 1rem;
+		}
+		
+		.result-view {
+			.icons-wrap {
+				display: flex;
+				gap: 0.5rem;
+				margin-bottom: 1rem;
+				
+				svg {
+					cursor: pointer;
+					fill: var(--text-color);
+					&:hover {
+						fill: var(--primary-color);
+					}
+					&.active {
+						fill: var(--primary-color);
+					}
+				}
+			}
+			
+			.browser, .console {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+			}
+			
+			.browser {
+				.iframe-wrap {
+					background-color: white;
+					border: 1px solid var(--text-color);
+					border-radius: 8px;
+					padding: 3px;
+					
+					iframe {
+						width: 100%;
+						height: 100%;
+						border: unset;
+						background-color: unset;
+					}
+				}
+			}
+			
+			.console {
+			
+			}
+		}
+	}
 `;
 
 export default Playground
