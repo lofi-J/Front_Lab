@@ -53,7 +53,7 @@ const mainCss = (langColor: string, tabCount: number) => css`
   flex: 1;
   max-width: calc(100% / ${tabCount});
   h1 {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 600;
   }
   .ground {
@@ -63,6 +63,7 @@ const mainCss = (langColor: string, tabCount: number) => css`
     padding: 3px;
     .code-mirror-wrapper {
       font-size: 80%;
+      line-height: 1.3;
     }
   }
 `;

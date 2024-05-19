@@ -7,6 +7,7 @@ import useLocalStorage from "../hooks/useLocalStorage.ts"
 import Ground from "../components/playground/Ground.tsx"
 import { GoBrowser } from "react-icons/go"
 import { VscDebugConsole } from "react-icons/vsc"
+import Console from "../components/playground/Console.tsx"
 
 type TResultMode = 'browser' | 'console'
 
@@ -90,7 +91,7 @@ const Playground = () => {
       </div>
 
       {!!selectedLang.length && (
-        <div className={'code-wrap'}>
+        <div className={'view-container'}>
           <div className={'code-view'}>
             {selectedLang.map(lang => (
               <Ground
@@ -114,18 +115,20 @@ const Playground = () => {
                 onClick={() => onClickResultIcon('console')}
               />
             </div>
-            {resultMode.includes('browser') && (
-              <div className={"browser"}>
-                <div className="iframe-wrap">
-                  <iframe srcDoc={srcDoc} />
+            <div className={'result-wrap'}>
+              {resultMode.includes('browser') && (
+                <div className={"browser"}>
+                  <div className="iframe-wrap">
+                    <iframe srcDoc={srcDoc} />
+                  </div>
                 </div>
-              </div>
-            )}
-            {resultMode.includes('console') && (
-              <div className={"console"}>
-                <div></div>
-              </div>
-            )}
+              )}
+              {resultMode.includes('console') && (
+                <div className={"console"}>
+                  <Console jsCode={js} />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -166,7 +169,7 @@ const mainCss = css`
 		}
 	}
 	
-	.code-wrap {
+	.view-container {
 		display: flex;
 		flex-direction: column;
 		gap: 2.4rem;
@@ -177,11 +180,12 @@ const mainCss = css`
 		}
 		
 		.result-view {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
 			.icons-wrap {
 				display: flex;
 				gap: 0.5rem;
-				margin-bottom: 1rem;
-				
 				svg {
 					cursor: pointer;
 					fill: var(--text-color);
@@ -194,10 +198,15 @@ const mainCss = css`
 				}
 			}
 			
+      .result-wrap {
+        display: flex;
+        gap: 1rem;
+      }
 			.browser, .console {
 				display: flex;
 				flex-direction: column;
 				gap: 1rem;
+        flex: 1;
 			}
 			
 			.browser {
@@ -217,7 +226,12 @@ const mainCss = css`
 			}
 			
 			.console {
-			
+        position: relative;
+			  border: 1px dashed var(--text-color);
+        border-radius: 8px;
+        padding: 5px;
+        max-height: 30vh;
+        overflow: scroll;
 			}
 		}
 	}
